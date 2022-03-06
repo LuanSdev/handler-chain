@@ -15,6 +15,21 @@ const makeSut = () => {
   return { sut };
 };
 
+class SomeClass {
+  public callsCount: number;
+  constructor() {
+    this.callsCount = 0;
+  }
+
+  async someMethod() {
+    this.callsCount++;
+  }
+}
+
+const makeSomeClass = () => {
+  return new SomeClass();
+};
+
 describe('Validation chain', () => {
   it('Should return an instance of ChainValidation', async () => {
     const { sut } = makeSut();
@@ -26,18 +41,7 @@ describe('Validation chain', () => {
   it('Should calls provided method', async () => {
     const { sut } = makeSut();
 
-    class SomeClass {
-      public callsCount: number;
-      constructor() {
-        this.callsCount = 0;
-      }
-
-      async someMethod() {
-        this.callsCount++;
-      }
-    }
-
-    const someClass = new SomeClass();
+    const someClass = makeSomeClass();
 
     await sut.execute(() => someClass.someMethod());
     expect(someClass.callsCount).toBe(1);

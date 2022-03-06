@@ -1,18 +1,32 @@
-import { ChainValidation } from './chain-validation';
+import { IChainValidator } from './protocols/chain-validator';
 
+class ChainValidatorSpy implements IChainValidator {
+  async next(nextMethod: () => Promise<any>): Promise<IChainValidator> {
+    await nextMethod();
+    return this;
+  }
+}
 class ValidationChain {
+  private readonly chainValidator: IChainValidator;
+
+  constructor({ chainValidator }) {
+    this.chainValidator = chainValidator;
+  }
+
   protected data: any;
 
-  async execute(method: () => Promise<void>): Promise<ChainValidation> {
+  async execute(method: () => Promise<void>): Promise<IChainValidator> {
     await method();
-    return new ChainValidation();
+    return this.chainValidator;
   }
 }
 
 const makeSut = () => {
-  const sut = new ValidationChain();
+  const chainValidatorSpy = new ChainValidatorSpy();
 
-  return { sut };
+  const sut = new ValidationChain({ chainValidator: chainValidatorSpy });
+
+  return { sut, chainValidatorSpy };
 };
 
 class SomeClass {
@@ -31,11 +45,13 @@ const makeSomeClass = () => {
 };
 
 describe('Validation chain', () => {
-  it('Should return an instance of ChainValidation', async () => {
+  it('Should return an object with next function', async () => {
     const { sut } = makeSut();
 
-    const response = await sut.execute(async () => null);
-    expect(response instanceof ChainValidation).toBe(true);
+    const someClass = new SomeClass();
+    const response = await sut.execute(async () => someClass.someMethod());
+
+    expect(response.next instanceof Function).toBe(true);
   });
 
   it('Should calls provided method', async () => {

@@ -1,5 +1,5 @@
 class HandlerChain {
-  private chain: Function[];
+  public readonly chain: Function[];
   private data: any;
 
   constructor(data: any) {
@@ -45,10 +45,19 @@ describe('Handler chain', () => {
   it('Should set nextHandler props with correct value', async () => {
     const { sut } = makeSut('valid-data');
 
-    const pimba = new SomeClass();
+    const someClass = new SomeClass();
 
-    await sut.nextHandler(pimba.handle).handle();
+    await sut.nextHandler(someClass.handle).handle();
 
-    expect(pimba.data).toBe('valid-data');
+    expect(someClass.data).toBe('valid-data');
+  });
+
+  it('Should push next handler to chain', async () => {
+    const { sut } = makeSut('valid-data');
+    const someClass = new SomeClass();
+
+    sut.nextHandler(someClass.handle).nextHandler(someClass.handle);
+
+    expect(sut.chain.length > 0).toBe(true);
   });
 });

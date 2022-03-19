@@ -1,13 +1,13 @@
-class HandlerChain {
+class HandlerChain<T> {
   public readonly chain: Function[];
-  private data: any;
+  private data: T;
 
-  constructor(data: any) {
+  constructor(data: T) {
     this.chain = [];
     this.data = data;
   }
 
-  nextHandler(method) {
+  nextHandler(method: Function) {
     this.chain.push(method);
 
     return this;

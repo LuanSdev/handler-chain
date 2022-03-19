@@ -24,7 +24,9 @@ describe('Handler chain', () => {
 
     const someClass = new SomeClass();
 
-    await sut.nextHandler(someClass.handle).handle();
+    await sut
+      .nextHandler(someClass.handle)
+      .handle({ errorMessage: 'any-message' });
 
     expect(someClass.data).toBe('valid-data');
   });
@@ -36,5 +38,20 @@ describe('Handler chain', () => {
     sut.nextHandler(someClass.handle).nextHandler(someClass.handle);
 
     expect(sut.chain.length > 0).toBe(true);
+  });
+
+  it('Should throw a default error if no handler has success', async () => {
+    const { sut } = makeSut('valid-data');
+    const someClass = new SomeClass();
+    someClass.handle = () => {
+      throw new Error();
+    };
+
+    const promise = sut
+      .nextHandler(someClass.handle)
+      .nextHandler(someClass.handle)
+      .handle({ errorMessage: 'error' });
+
+    await expect(promise).rejects.toThrow(new Error('error'));
   });
 });

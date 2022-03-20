@@ -7,6 +7,8 @@ export default {
     '@/(.*)': '<rootDir>/src/$1',
   },
 
+  testMatch: ['**/*.spec.ts'],
+
   globals: {
     'ts-jest': {
       diagnostics: false,

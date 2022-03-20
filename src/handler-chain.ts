@@ -21,6 +21,8 @@ export class HandlerChain<T> {
       await nextHandler(this.data);
 
       this.atLastOneSuccess = true;
+    } catch {
+      return;
     } finally {
       if (this.chain.length > 0) {
         await this.handle({ errorMessage });

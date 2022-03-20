@@ -23,6 +23,11 @@ const makeSut = (method: PaymentMethod) => {
 };
 
 describe('CreatePayment', () => {
+  beforeEach(() => {
+    createCreditPayment.handled = false;
+    createSlipPayment.handled = false;
+  });
+
   it('Should createSLipPayment handled', async () => {
     const { sut } = makeSut('slip');
 
@@ -30,5 +35,13 @@ describe('CreatePayment', () => {
 
     expect(createSlipPayment.handled).toBe(true);
     expect(createCreditPayment.handled).not.toBe(true);
+  });
+  it('Should createCreditPayment handled', async () => {
+    const { sut } = makeSut('credit');
+
+    await sut.create();
+
+    expect(createCreditPayment.handled).toBe(true);
+    expect(createSlipPayment.handled).not.toBe(true);
   });
 });

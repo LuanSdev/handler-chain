@@ -4,42 +4,40 @@ import { createSlipPayment } from './spys/createSlipPayment';
 
 type PaymentMethod = 'credit' | 'slip';
 
-class CreatePayment {
-  constructor(private readonly handlerChain: HandlerChain<PaymentMethod>) {}
+class CreatePaymentChain extends HandlerChain {
+  async create(paymentMethod: PaymentMethod) {
+    this.data = paymentMethod;
 
-  async create() {
-    await this.handlerChain
-      .nextHandler(createSlipPayment.create)
+    await this.nextHandler(createSlipPayment.create)
       .nextHandler(createCreditPayment.create)
       .handle({ errorMessage: 'Incorrect method.' });
   }
 }
 
-const makeSut = (method: PaymentMethod) => {
-  const paymentChain = new HandlerChain<PaymentMethod>(method);
-  const sut = new CreatePayment(paymentChain);
+const makeSut = () => {
+  const sut = new CreatePaymentChain();
 
   return { sut };
 };
 
-describe('CreatePayment', () => {
+describe('CreatePaymentChain', () => {
   beforeEach(() => {
     createCreditPayment.handled = false;
     createSlipPayment.handled = false;
   });
 
   it('Should createSLipPayment handled', async () => {
-    const { sut } = makeSut('slip');
+    const { sut } = makeSut();
 
-    await sut.create();
+    await sut.create('slip');
 
     expect(createSlipPayment.handled).toBe(true);
     expect(createCreditPayment.handled).not.toBe(true);
   });
   it('Should createCreditPayment handled', async () => {
-    const { sut } = makeSut('credit');
+    const { sut } = makeSut();
 
-    await sut.create();
+    await sut.create('credit');
 
     expect(createCreditPayment.handled).toBe(true);
     expect(createSlipPayment.handled).not.toBe(true);

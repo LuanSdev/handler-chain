@@ -1,11 +1,13 @@
-class CreateSlipPayment {
+import { IPaymentHandler } from '../protocols/payment-handler';
+
+class CreateSlipPayment implements IPaymentHandler<'slip'> {
   public handled: boolean;
 
   constructor() {
     this.create = this.create.bind(this);
   }
 
-  create(method: string) {
+  async create(method: string) {
     if (method !== 'slip') {
       throw new Error();
     }

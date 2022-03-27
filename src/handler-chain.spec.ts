@@ -1,7 +1,7 @@
 import { HandlerChain } from './handler-chain';
 
-const makeSut = (data) => {
-  const sut = new HandlerChain(data);
+const makeSut = () => {
+  const sut = new HandlerChain();
 
   return { sut };
 };
@@ -19,20 +19,8 @@ class SomeClass {
 }
 
 describe('Handler chain', () => {
-  it('Should set nextHandler props with correct value', async () => {
-    const { sut } = makeSut('valid-data');
-
-    const someClass = new SomeClass();
-
-    await sut
-      .nextHandler(someClass.handle)
-      .handle({ errorMessage: 'any-message' });
-
-    expect(someClass.data).toBe('valid-data');
-  });
-
   it('Should push next handler to chain', async () => {
-    const { sut } = makeSut('valid-data');
+    const { sut } = makeSut();
     const someClass = new SomeClass();
 
     sut.nextHandler(someClass.handle).nextHandler(someClass.handle);
@@ -41,7 +29,7 @@ describe('Handler chain', () => {
   });
 
   it('Should throw a default error if no handler has success', async () => {
-    const { sut } = makeSut('valid-data');
+    const { sut } = makeSut();
     const someClass = new SomeClass();
     someClass.handle = () => {
       throw new Error();
@@ -56,7 +44,7 @@ describe('Handler chain', () => {
   });
 
   it('Should atLeastOneSuccess true if at last one handler succeed', async () => {
-    const { sut } = makeSut('valid-data');
+    const { sut } = makeSut();
     const withError = new SomeClass();
     const withoutError = new SomeClass();
 

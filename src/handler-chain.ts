@@ -1,12 +1,11 @@
-export class HandlerChain<T> {
+export class HandlerChain {
   public readonly chain: Function[];
-  private data: T;
+  protected data: any;
   public atLastOneSuccess: boolean;
 
-  constructor(data: T) {
+  constructor() {
     this.chain = [];
     this.atLastOneSuccess = false;
-    this.data = data;
   }
 
   nextHandler(method: Function) {

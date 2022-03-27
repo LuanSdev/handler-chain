@@ -1,21 +1,9 @@
-import { HandlerChain } from '@/handler-chain';
+import { CreatePaymentChain } from './create-payment';
 import { createCreditPayment } from './spys/createCreditPayment';
 import { createSlipPayment } from './spys/createSlipPayment';
 
-type PaymentMethod = 'credit' | 'slip';
-
-class CreatePaymentChain extends HandlerChain {
-  async create(paymentMethod: PaymentMethod) {
-    this.data = paymentMethod;
-
-    await this.nextHandler(createSlipPayment.create)
-      .nextHandler(createCreditPayment.create)
-      .handle({ errorMessage: 'Incorrect method.' });
-  }
-}
-
 const makeSut = () => {
-  const sut = new CreatePaymentChain();
+  const sut = new CreatePaymentChain([createCreditPayment, createSlipPayment]);
 
   return { sut };
 };

@@ -42,21 +42,4 @@ describe('Handler chain', () => {
 
     await expect(promise).rejects.toThrow(new Error('error'));
   });
-
-  it('Should atLeastOneSuccess true if at last one handler succeed', async () => {
-    const { sut } = makeSut();
-    const withError = new SomeClass();
-    const withoutError = new SomeClass();
-
-    withError.handle = () => {
-      throw new Error();
-    };
-
-    await sut
-      .nextHandler(withError.handle)
-      .nextHandler(withoutError.handle)
-      .handle({ errorMessage: 'error' });
-
-    expect(sut.atLastOneSuccess).toBe(true);
-  });
 });
